@@ -1,5 +1,6 @@
 package com.example.newsunnyweather.ui.place
 
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,22 +11,39 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsunnyweather.R
 import com.example.newsunnyweather.logic.model.Place
+import com.example.newsunnyweather.logic.model.Weather
+import com.example.newsunnyweather.ui.weather.WeatherActivity
 
-class PlaceAdapter(private val fragment: Fragment, private val placeList: List<Place>) :
+class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: List<Place>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val newType = 1
     private val commonType = 0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         var view: View
+        var holder: RecyclerView.ViewHolder
         val context = parent.context
         val layoutInflater = LayoutInflater.from(context)
-        return if (viewType == commonType) {
+        if (viewType == commonType) {
             view = layoutInflater.inflate(R.layout.place_item_common, parent, false)
-            CommonPlaceViewHolder(view)
+            holder = CommonPlaceViewHolder(view)
         } else {
             view = layoutInflater.inflate(R.layout.place_item_new, parent, false)
-            NewPlaceViewHolder(view)
+            holder = NewPlaceViewHolder(view)
         }
+        holder.itemView.setOnClickListener {
+            val position = holder.adapterPosition
+            val place = placeList[position]
+            val intent = Intent(parent.context, WeatherActivity::class.java).apply {
+                putExtra("location_lng", place.location.lng)
+                putExtra("location_lat", place.location.lat)
+                putExtra("place_name", place.name)
+                Log.d("placeName", place.name)
+            }
+            fragment.startActivity(intent)
+            fragment.activity?.finish()
+            fragment.viewModel.savePlace(place)
+        }
+        return holder
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
