@@ -12,12 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsunnyweather.MainActivity
 import com.example.newsunnyweather.R
 import com.example.newsunnyweather.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.fragment_place.*
 import java.util.*
 
-class PlaceFragment: Fragment() {
+class PlaceFragment : Fragment() {
 
     val viewModel by lazy { ViewModelProvider(this).get(PlaceViewModel::class.java) }
 
@@ -25,14 +26,14 @@ class PlaceFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_place, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (viewModel.isPlaceSaved()) {
+        if (activity is MainActivity && viewModel.isPlaceSaved()) {
             val place = viewModel.getSavedPlace()
             val intent = Intent(context, WeatherActivity::class.java).apply {
                 putExtra("location_lng", place.location.lng)
@@ -52,7 +53,7 @@ class PlaceFragment: Fragment() {
             val content = editable.toString()
             if (content.isNotEmpty()) {
                 viewModel.searchPlaces(content)
-            } else{
+            } else {
                 recycleView.visibility = View.GONE
                 bgImageView.visibility = View.VISIBLE
                 viewModel.placeList.clear()
@@ -66,7 +67,7 @@ class PlaceFragment: Fragment() {
                 recycleView.visibility = View.VISIBLE
                 bgImageView.visibility = View.GONE
                 viewModel.placeList.clear()
-                Log.d("TAG","size = ${places.size}")
+                Log.d("TAG", "size = ${places.size}")
                 viewModel.placeList.addAll(places)
                 adapter.notifyDataSetChanged()
             } else {
